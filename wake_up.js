@@ -350,6 +350,15 @@ function getLastUserTime(messages) {
       const parsed = parseTimelineTimestamp(content);
       if (parsed) return parsed;
     }
+    // 批注 2026-09-27：网页对话（webchat）事件同样代表用户活跃——
+    // 用户在网页上说话时也应重置唤醒计时，避免刚在网页聊完天还收到"想念"推送。
+    if (msg.role === "assistant") {
+      const content = normalizeContentToText(msg.content);
+      if (/^\s*[（(]\s*\d{4}[-/]\d{1,2}[-/]\d{1,2}(?:[ T]?)\d{1,2}[:：]\d{2}\s+网页对话[｜|]\s*加加/.test(content)) {
+        const parsed = parseTimelineTimestamp(content);
+        if (parsed) return parsed;
+      }
+    }
   }
   return null;
 }
